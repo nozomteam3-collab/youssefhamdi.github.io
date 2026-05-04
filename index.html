@@ -1,0 +1,528 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Youssef Ahmed Hamdi - Architect</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--black:#0a0a0a;--white:#f5f5f0;--gray:#888;--light:#e8e8e3;--accent:#1a1a1a}
+  body{background:var(--black);color:var(--white);font-family:'Space Mono',monospace;min-height:100vh}
+
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.5rem 3rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;background:rgba(10,10,10,0.95);backdrop-filter:blur(8px)}
+  .logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;letter-spacing:0.2em;color:var(--white)}
+  .logo span{color:var(--gray)}
+  .nav-links{display:flex;gap:2rem}
+  .nav-links a{color:var(--gray);text-decoration:none;font-size:0.7rem;letter-spacing:0.15em;transition:color 0.3s;cursor:pointer}
+  .nav-links a:hover{color:var(--white)}
+  .admin-btn{background:transparent;border:1px solid #333;color:var(--gray);padding:0.4rem 1rem;font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;transition:all 0.3s}
+  .admin-btn:hover{border-color:var(--white);color:var(--white)}
+
+  /* PAGES */
+  .page{display:none;padding-top:80px;min-height:100vh}
+  .page.active{display:block}
+
+  /* HERO */
+  #home{display:none}
+  #home.active{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:0 3rem;min-height:100vh;border-left:1px solid #1a1a1a}
+  .hero-label{font-size:0.65rem;letter-spacing:0.3em;color:var(--gray);margin-bottom:1.5rem}
+  .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,8vw,6rem);font-weight:300;line-height:1.05;margin-bottom:1.5rem}
+  .hero-title em{font-style:italic;color:var(--gray)}
+  .hero-sub{font-size:0.7rem;letter-spacing:0.1em;color:var(--gray);max-width:400px;line-height:2}
+  .hero-line{width:60px;height:1px;background:var(--gray);margin:2rem 0}
+  .hero-cta{display:inline-block;padding:0.8rem 2rem;border:1px solid #333;color:var(--white);font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.2em;cursor:pointer;transition:all 0.3s;text-decoration:none}
+  .hero-cta:hover{background:var(--white);color:var(--black)}
+  .scroll-hint{position:absolute;bottom:3rem;right:3rem;font-size:0.6rem;letter-spacing:0.2em;color:#444;writing-mode:vertical-rl}
+
+  /* PROJECTS PAGE */
+  #projects.active{display:block}
+  .page-header{padding:3rem 3rem 2rem;border-bottom:1px solid #1a1a1a}
+  .page-header h2{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:300}
+  .page-header p{color:var(--gray);font-size:0.65rem;letter-spacing:0.2em;margin-top:0.5rem}
+  
+  .filter-bar{display:flex;gap:1rem;padding:1.5rem 3rem;border-bottom:1px solid #1a1a1a;flex-wrap:wrap}
+  .filter-btn{background:transparent;border:1px solid #2a2a2a;color:var(--gray);padding:0.4rem 1.2rem;font-family:'Space Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;cursor:pointer;transition:all 0.3s}
+  .filter-btn.active,.filter-btn:hover{border-color:var(--white);color:var(--white)}
+
+  .projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1px;background:#1a1a1a;margin:1px}
+  .project-card{background:var(--black);cursor:pointer;overflow:hidden;position:relative;aspect-ratio:4/3;transition:all 0.3s}
+  .project-card:hover .card-overlay{opacity:1}
+  .project-img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%);transition:filter 0.5s}
+  .project-img-placeholder{width:100%;height:100%;background:linear-gradient(135deg,#111 0%,#1a1a1a 50%,#0f0f0f 100%);display:flex;align-items:center;justify-content:center}
+  .project-img-placeholder span{font-size:3rem;opacity:0.1}
+  .card-overlay{position:absolute;inset:0;background:rgba(10,10,10,0.9);opacity:0;transition:opacity 0.3s;display:flex;flex-direction:column;justify-content:flex-end;padding:1.5rem}
+  .card-overlay h3{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;margin-bottom:0.3rem}
+  .card-overlay p{font-size:0.6rem;letter-spacing:0.15em;color:var(--gray)}
+  .card-overlay .tag{display:inline-block;border:1px solid #333;padding:0.2rem 0.6rem;font-size:0.55rem;letter-spacing:0.1em;color:var(--gray);margin-top:0.8rem}
+  .empty-state{grid-column:1/-1;padding:4rem;text-align:center;color:var(--gray)}
+  .empty-state p{font-size:0.75rem;letter-spacing:0.1em;line-height:2}
+
+  /* ABOUT PAGE */
+  #about.active{display:block}
+  .about-content{padding:3rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;max-width:1000px}
+  .about-text{font-size:0.75rem;line-height:2.2;color:var(--gray)}
+  .about-text h3{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:var(--white);margin-bottom:1.5rem}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:2rem}
+  .stat-item .num{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:300;line-height:1}
+  .stat-item .label{font-size:0.6rem;letter-spacing:0.2em;color:var(--gray);margin-top:0.3rem}
+  .skills-list{margin-top:2rem}
+  .skill{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+  .skill span{font-size:0.65rem;letter-spacing:0.1em;color:var(--gray);min-width:120px}
+  .skill-bar{flex:1;height:1px;background:#1a1a1a;position:relative}
+  .skill-fill{height:1px;background:var(--white);transition:width 1s ease}
+
+  /* CONTACT PAGE */
+  #contact.active{display:block}
+  .contact-content{padding:3rem;max-width:600px}
+  .contact-content h3{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:2rem}
+  .contact-info{display:flex;flex-direction:column;gap:1.5rem}
+  .contact-item{display:flex;align-items:flex-start;gap:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid #1a1a1a}
+  .contact-item .ci-label{font-size:0.6rem;letter-spacing:0.2em;color:var(--gray);min-width:80px}
+  .contact-item .ci-value{font-size:0.75rem;letter-spacing:0.05em;color:var(--white)}
+
+  /* ADMIN PANEL */
+  #admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:1000;overflow-y:auto}
+  #admin-overlay.open{display:block}
+  .admin-panel{max-width:700px;margin:0 auto;padding:3rem 2rem}
+  .admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:3rem;padding-bottom:1.5rem;border-bottom:1px solid #222}
+  .admin-header h2{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300}
+  .close-btn{background:transparent;border:1px solid #333;color:var(--gray);width:36px;height:36px;cursor:pointer;font-size:1.1rem;transition:all 0.3s;display:flex;align-items:center;justify-content:center}
+  .close-btn:hover{border-color:var(--white);color:var(--white)}
+  
+  .admin-tabs{display:flex;gap:0;margin-bottom:2rem;border:1px solid #222}
+  .admin-tab{flex:1;background:transparent;border:none;padding:0.8rem;font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;color:var(--gray);cursor:pointer;transition:all 0.3s;border-right:1px solid #222}
+  .admin-tab:last-child{border-right:none}
+  .admin-tab.active{background:#111;color:var(--white)}
+
+  .admin-section{display:none}
+  .admin-section.active{display:block}
+
+  .form-group{margin-bottom:1.5rem}
+  .form-group label{display:block;font-size:0.6rem;letter-spacing:0.2em;color:var(--gray);margin-bottom:0.5rem}
+  .form-group input,.form-group textarea,.form-group select{width:100%;background:#0f0f0f;border:1px solid #222;color:var(--white);padding:0.7rem 1rem;font-family:'Space Mono',monospace;font-size:0.7rem;outline:none;transition:border-color 0.3s}
+  .form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:#444}
+  .form-group textarea{resize:vertical;min-height:80px}
+  .form-group select option{background:#0f0f0f}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+  
+  .img-upload-area{border:1px dashed #333;padding:2rem;text-align:center;cursor:pointer;transition:all 0.3s;position:relative}
+  .img-upload-area:hover{border-color:#555}
+  .img-upload-area input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .img-upload-area p{font-size:0.65rem;letter-spacing:0.1em;color:var(--gray)}
+  .img-preview{max-width:100%;max-height:150px;object-fit:cover;margin-top:1rem;filter:grayscale(100%)}
+
+  .submit-btn{width:100%;background:var(--white);color:var(--black);border:none;padding:0.9rem;font-family:'Space Mono',monospace;font-size:0.7rem;letter-spacing:0.2em;cursor:pointer;transition:all 0.3s;margin-top:0.5rem}
+  .submit-btn:hover{background:var(--light)}
+  .danger-btn{background:transparent;border:1px solid #333;color:#666;padding:0.4rem 1rem;font-family:'Space Mono',monospace;font-size:0.6rem;cursor:pointer;transition:all 0.3s}
+  .danger-btn:hover{border-color:#c0392b;color:#c0392b}
+
+  .project-list-item{display:flex;align-items:center;gap:1rem;padding:1rem;border:1px solid #1a1a1a;margin-bottom:0.5rem;transition:border-color 0.3s}
+  .project-list-item:hover{border-color:#333}
+  .pli-img{width:60px;height:45px;object-fit:cover;filter:grayscale(100%);background:#111;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#333;font-size:0.6rem}
+  .pli-info{flex:1}
+  .pli-info h4{font-size:0.75rem;margin-bottom:0.2rem}
+  .pli-info p{font-size:0.6rem;color:var(--gray);letter-spacing:0.05em}
+  .pli-actions{display:flex;gap:0.5rem}
+
+  .success-msg{background:#0f1a0f;border:1px solid #1a3a1a;color:#4a9a4a;padding:0.8rem 1rem;font-size:0.65rem;letter-spacing:0.05em;margin-bottom:1rem;display:none}
+  .success-msg.show{display:block}
+
+  /* PROJECT MODAL */
+  #proj-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:2000;overflow-y:auto;padding:2rem}
+  #proj-modal.open{display:flex;align-items:flex-start;justify-content:center}
+  .modal-inner{max-width:800px;width:100%;padding:1rem}
+  .modal-close{background:transparent;border:1px solid #333;color:var(--gray);padding:0.4rem 1rem;font-family:'Space Mono',monospace;font-size:0.6rem;cursor:pointer;margin-bottom:2rem;transition:all 0.3s}
+  .modal-close:hover{color:var(--white);border-color:var(--white)}
+  .modal-img{width:100%;max-height:500px;object-fit:cover;filter:grayscale(100%);margin-bottom:2rem}
+  .modal-img-placeholder{width:100%;height:300px;background:linear-gradient(135deg,#111,#1a1a1a);display:flex;align-items:center;justify-content:center;margin-bottom:2rem;color:#222;font-size:4rem}
+  .modal-title{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:300;margin-bottom:0.5rem}
+  .modal-meta{display:flex;gap:2rem;margin-bottom:1.5rem;flex-wrap:wrap}
+  .modal-meta span{font-size:0.6rem;letter-spacing:0.15em;color:var(--gray)}
+  .modal-desc{font-size:0.75rem;line-height:2.2;color:var(--gray);max-width:600px}
+
+  @media(max-width:768px){
+    nav{padding:1rem 1.5rem}
+    #home.active{padding:0 1.5rem}
+    .hero-title{font-size:3rem}
+    .page-header,.filter-bar,.about-content,.contact-content,.admin-panel{padding:1.5rem}
+    .about-content{grid-template-columns:1fr;gap:2rem}
+    .form-row{grid-template-columns:1fr}
+    .admin-tabs{flex-wrap:wrap}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">YOUSSEF <span>HAMDI</span></div>
+  <div class="nav-links">
+    <a onclick="showPage('home')">HOME</a>
+    <a onclick="showPage('projects')">WORK</a>
+    <a onclick="showPage('about')">ABOUT</a>
+    <a onclick="showPage('contact')">CONTACT</a>
+  </div>
+  <button class="admin-btn" onclick="openAdmin()">&#9776; MANAGE</button>
+</nav>
+
+<!-- HOME -->
+<div id="home" class="page active">
+  <div class="hero-label">ARCHITECTURAL PORTFOLIO — CAIRO UNIVERSITY 2025</div>
+  <h1 class="hero-title">Youssef<br>Ahmed<br><em>Hamdi</em></h1>
+  <div class="hero-line"></div>
+  <p class="hero-sub">ARCHITECT · DESIGNER · THINKER<br>Creating spaces that breathe, inspire, and endure.</p>
+  <a class="hero-cta" onclick="showPage('projects')" style="margin-top:2rem">VIEW WORK →</a>
+  <div class="scroll-hint">SCROLL TO EXPLORE</div>
+</div>
+
+<!-- PROJECTS -->
+<div id="projects" class="page">
+  <div class="page-header">
+    <h2>Selected Work</h2>
+    <p>ARCHITECTURAL PROJECTS — 2022 – 2025</p>
+  </div>
+  <div class="filter-bar" id="filter-bar">
+    <button class="filter-btn active" onclick="filterProjects('all',this)">ALL</button>
+  </div>
+  <div class="projects-grid" id="projects-grid">
+    <div class="empty-state">
+      <p>NO PROJECTS YET<br>USE THE MANAGE BUTTON TO ADD YOUR WORK</p>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div id="about" class="page">
+  <div class="page-header">
+    <h2>About</h2>
+    <p>THE ARCHITECT BEHIND THE WORK</p>
+  </div>
+  <div class="about-content">
+    <div>
+      <div class="about-text">
+        <h3>Youssef Ahmed Hamdi</h3>
+        <p>Architect graduated from Cairo University, Faculty of Engineering, Class of 2025. Passionate about the intersection of form, function, and cultural context in contemporary architecture.</p>
+        <p style="margin-top:1rem">My work explores how space can shape human experience — from intimate residential designs to bold civic structures. Every project begins with a question: what does this place need to say?</p>
+      </div>
+      <div class="stats">
+        <div class="stat-item">
+          <div class="num" id="proj-count">0</div>
+          <div class="label">PROJECTS</div>
+        </div>
+        <div class="stat-item">
+          <div class="num">2025</div>
+          <div class="label">GRADUATED</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="about-text" style="margin-bottom:1.5rem">
+        <p style="font-size:0.6rem;letter-spacing:0.2em;color:#555;margin-bottom:1rem">SKILLS & SOFTWARE</p>
+      </div>
+      <div class="skills-list">
+        <div class="skill"><span>AutoCAD</span><div class="skill-bar"><div class="skill-fill" style="width:95%"></div></div></div>
+        <div class="skill"><span>Revit</span><div class="skill-bar"><div class="skill-fill" style="width:85%"></div></div></div>
+        <div class="skill"><span>SketchUp</span><div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div></div>
+        <div class="skill"><span>3ds Max</span><div class="skill-bar"><div class="skill-fill" style="width:80%"></div></div></div>
+        <div class="skill"><span>Photoshop</span><div class="skill-bar"><div class="skill-fill" style="width:88%"></div></div></div>
+        <div class="skill"><span>Lumion</span><div class="skill-bar"><div class="skill-fill" style="width:75%"></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div id="contact" class="page">
+  <div class="page-header">
+    <h2>Contact</h2>
+    <p>GET IN TOUCH</p>
+  </div>
+  <div class="contact-content">
+    <div class="contact-info">
+      <div class="contact-item">
+        <span class="ci-label">EMAIL</span>
+        <span class="ci-value" id="c-email">youssefhamdi@email.com</span>
+      </div>
+      <div class="contact-item">
+        <span class="ci-label">PHONE</span>
+        <span class="ci-value" id="c-phone">+20 100 000 0000</span>
+      </div>
+      <div class="contact-item">
+        <span class="ci-label">LOCATION</span>
+        <span class="ci-value" id="c-location">Cairo, Egypt</span>
+      </div>
+      <div class="contact-item">
+        <span class="ci-label">EDUCATION</span>
+        <span class="ci-value">Cairo University · Faculty of Engineering · 2025</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN OVERLAY -->
+<div id="admin-overlay">
+  <div class="admin-panel">
+    <div class="admin-header">
+      <h2>Manage Portfolio</h2>
+      <button class="close-btn" onclick="closeAdmin()">✕</button>
+    </div>
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchTab('add')">ADD PROJECT</button>
+      <button class="admin-tab" onclick="switchTab('manage')">MY PROJECTS</button>
+      <button class="admin-tab" onclick="switchTab('settings')">SETTINGS</button>
+    </div>
+
+    <!-- ADD PROJECT -->
+    <div id="tab-add" class="admin-section active">
+      <div class="success-msg" id="add-success">✓ Project added successfully</div>
+      <div class="form-group">
+        <label>PROJECT TITLE *</label>
+        <input type="text" id="p-title" placeholder="e.g. Residential Complex, Cairo">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>YEAR</label>
+          <input type="text" id="p-year" placeholder="2024">
+        </div>
+        <div class="form-group">
+          <label>CATEGORY</label>
+          <select id="p-cat">
+            <option value="residential">Residential</option>
+            <option value="commercial">Commercial</option>
+            <option value="cultural">Cultural</option>
+            <option value="urban">Urban Design</option>
+            <option value="interior">Interior</option>
+            <option value="concept">Concept</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>LOCATION</label>
+        <input type="text" id="p-location" placeholder="Cairo, Egypt">
+      </div>
+      <div class="form-group">
+        <label>DESCRIPTION</label>
+        <textarea id="p-desc" placeholder="Brief description of the project, concept, and approach..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>PROJECT IMAGE</label>
+        <div class="img-upload-area" id="upload-area">
+          <input type="file" accept="image/*" id="img-input" onchange="handleImg(this)">
+          <p id="upload-text">CLICK TO UPLOAD IMAGE</p>
+          <img id="img-preview-el" class="img-preview" style="display:none">
+        </div>
+      </div>
+      <button class="submit-btn" onclick="addProject()">ADD PROJECT →</button>
+    </div>
+
+    <!-- MANAGE PROJECTS -->
+    <div id="tab-manage" class="admin-section">
+      <div id="manage-list"></div>
+      <div id="manage-empty" style="text-align:center;padding:3rem;color:var(--gray);font-size:0.65rem;letter-spacing:0.1em">NO PROJECTS YET</div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="tab-settings" class="admin-section">
+      <div class="success-msg" id="settings-success">✓ Settings saved</div>
+      <div class="form-group">
+        <label>YOUR NAME</label>
+        <input type="text" id="s-name" value="Youssef Ahmed Hamdi">
+      </div>
+      <div class="form-group">
+        <label>EMAIL</label>
+        <input type="text" id="s-email" value="youssefhamdi@email.com">
+      </div>
+      <div class="form-group">
+        <label>PHONE</label>
+        <input type="text" id="s-phone" value="+20 100 000 0000">
+      </div>
+      <div class="form-group">
+        <label>LOCATION</label>
+        <input type="text" id="s-location" value="Cairo, Egypt">
+      </div>
+      <div class="form-group">
+        <label>BIO (SHORT)</label>
+        <textarea id="s-bio" rows="3">Architect graduated from Cairo University, Faculty of Engineering, Class of 2025.</textarea>
+      </div>
+      <button class="submit-btn" onclick="saveSettings()">SAVE SETTINGS →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECT MODAL -->
+<div id="proj-modal">
+  <div class="modal-inner">
+    <button class="modal-close" onclick="closeModal()">← BACK TO WORK</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+  let projects = [];
+  let imgData = null;
+  let currentFilter = 'all';
+
+  function showPage(id){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if(id==='about') document.getElementById('proj-count').textContent = projects.length;
+  }
+
+  function openAdmin(){
+    document.getElementById('admin-overlay').classList.add('open');
+    renderManageList();
+  }
+
+  function closeAdmin(){
+    document.getElementById('admin-overlay').classList.remove('open');
+  }
+
+  function switchTab(tab){
+    document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('tab-'+tab).classList.add('active');
+    if(tab==='manage') renderManageList();
+  }
+
+  function handleImg(input){
+    const file = input.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = e=>{
+      imgData = e.target.result;
+      document.getElementById('img-preview-el').src = imgData;
+      document.getElementById('img-preview-el').style.display = 'block';
+      document.getElementById('upload-text').textContent = '✓ IMAGE LOADED — CLICK TO CHANGE';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function addProject(){
+    const title = document.getElementById('p-title').value.trim();
+    if(!title){document.getElementById('p-title').focus();return;}
+    const proj = {
+      id: Date.now(),
+      title,
+      year: document.getElementById('p-year').value||'2025',
+      category: document.getElementById('p-cat').value,
+      location: document.getElementById('p-location').value||'Egypt',
+      desc: document.getElementById('p-desc').value,
+      img: imgData
+    };
+    projects.push(proj);
+    renderProjects();
+    updateFilters();
+    document.getElementById('p-title').value='';
+    document.getElementById('p-year').value='';
+    document.getElementById('p-location').value='';
+    document.getElementById('p-desc').value='';
+    document.getElementById('img-preview-el').style.display='none';
+    document.getElementById('upload-text').textContent='CLICK TO UPLOAD IMAGE';
+    imgData=null;
+    document.getElementById('img-input').value='';
+    const msg=document.getElementById('add-success');
+    msg.classList.add('show');
+    setTimeout(()=>msg.classList.remove('show'),3000);
+  }
+
+  function renderProjects(){
+    const grid = document.getElementById('projects-grid');
+    const filtered = currentFilter==='all' ? projects : projects.filter(p=>p.category===currentFilter);
+    if(filtered.length===0){
+      grid.innerHTML = projects.length===0
+        ? '<div class="empty-state"><p>NO PROJECTS YET<br>USE THE MANAGE BUTTON TO ADD YOUR WORK</p></div>'
+        : '<div class="empty-state"><p>NO PROJECTS IN THIS CATEGORY</p></div>';
+      return;
+    }
+    grid.innerHTML = filtered.map(p=>`
+      <div class="project-card" onclick="openModal(${p.id})">
+        ${p.img
+          ? `<img class="project-img" src="${p.img}" alt="${p.title}">`
+          : `<div class="project-img-placeholder"><span>◻</span></div>`}
+        <div class="card-overlay">
+          <p style="font-size:0.55rem;letter-spacing:0.2em;color:#555;margin-bottom:0.3rem">${p.year} — ${p.location}</p>
+          <h3>${p.title}</h3>
+          <p>${p.category.toUpperCase()}</p>
+          <span class="tag">VIEW PROJECT</span>
+        </div>
+      </div>`).join('');
+  }
+
+  function updateFilters(){
+    const cats = [...new Set(projects.map(p=>p.category))];
+    const bar = document.getElementById('filter-bar');
+    bar.innerHTML = `<button class="filter-btn ${currentFilter==='all'?'active':''}" onclick="filterProjects('all',this)">ALL</button>`
+      + cats.map(c=>`<button class="filter-btn ${currentFilter===c?'active':''}" onclick="filterProjects('${c}',this)">${c.toUpperCase()}</button>`).join('');
+  }
+
+  function filterProjects(cat, btn){
+    currentFilter = cat;
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderProjects();
+  }
+
+  function openModal(id){
+    const p = projects.find(x=>x.id===id);
+    if(!p) return;
+    document.getElementById('modal-content').innerHTML = `
+      ${p.img
+        ? `<img class="modal-img" src="${p.img}" alt="${p.title}">`
+        : `<div class="modal-img-placeholder">◻</div>`}
+      <h2 class="modal-title">${p.title}</h2>
+      <div class="modal-meta">
+        <span>${p.year}</span>
+        <span>·</span>
+        <span>${p.category.toUpperCase()}</span>
+        <span>·</span>
+        <span>${p.location}</span>
+      </div>
+      ${p.desc ? `<p class="modal-desc">${p.desc}</p>` : ''}`;
+    document.getElementById('proj-modal').classList.add('open');
+  }
+
+  function closeModal(){
+    document.getElementById('proj-modal').classList.remove('open');
+  }
+
+  function renderManageList(){
+    const list = document.getElementById('manage-list');
+    const empty = document.getElementById('manage-empty');
+    if(projects.length===0){list.innerHTML='';empty.style.display='block';return;}
+    empty.style.display='none';
+    list.innerHTML = projects.map(p=>`
+      <div class="project-list-item">
+        <div class="pli-img">
+          ${p.img ? `<img src="${p.img}" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">` : '◻'}
+        </div>
+        <div class="pli-info">
+          <h4>${p.title}</h4>
+          <p>${p.year} — ${p.category} — ${p.location}</p>
+        </div>
+        <div class="pli-actions">
+          <button class="danger-btn" onclick="deleteProject(${p.id})">DELETE</button>
+        </div>
+      </div>`).join('');
+  }
+
+  function deleteProject(id){
+    projects = projects.filter(p=>p.id!==id);
+    renderProjects();
+    updateFilters();
+    renderManageList();
+  }
+
+  function saveSettings(){
+    document.getElementById('c-email').textContent = document.getElementById('s-email').value;
+    document.getElementById('c-phone').textContent = document.getElementById('s-phone').value;
+    document.getElementById('c-location').textContent = document.getElementById('s-location').value;
+    const msg=document.getElementById('settings-success');
+    msg.classList.add('show');
+    setTimeout(()=>msg.classList.remove('show'),3000);
+  }
+</script>
+</body>
+</html>
